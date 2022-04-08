@@ -5,14 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("FACTDBConnection")));
-
 builder.Services.AddScoped<iproducts, productsRepository>();
 builder.Services.AddScoped<istockIns , stockInsRepository>();
 builder.Services.AddScoped<istockOuts , stockOutsRepository>();
-
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

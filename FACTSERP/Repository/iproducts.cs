@@ -4,7 +4,7 @@ namespace FACTSERP.Repository
 {
     public interface iproducts
     {
-        IEnumerable<products> GetAllProducts { get; }
+        //IEnumerable<products> GetAllProducts { get; }
         
         products GeProductsById(int id);
         products GetproductsByName(string name);

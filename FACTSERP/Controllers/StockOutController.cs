@@ -1,5 +1,6 @@
 ﻿using FACTSERP.Models;
 using FACTSERP.Repository;
+using FACTSERP.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FACTSERP.Controllers
@@ -8,21 +9,33 @@ namespace FACTSERP.Controllers
     {
         private readonly istockOuts istockOuts;
         private readonly iproducts iproducts;
+        private readonly HelperClass objHelper;
 
-        public StockOutController(istockOuts _istockOuts, iproducts _iproducts)
+        public StockOutController(istockOuts _istockOuts, iproducts _iproducts, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment)
         {
             istockOuts = _istockOuts;
             iproducts = _iproducts;
+            objHelper = new HelperClass(hostingEnvironment);
         }
         public IActionResult Index()
         {
-            return View(istockOuts.GetAllstockOuts);
+            ERPFacts objDB = objHelper.GetDatabase();
+            List<products> objProducts = objDB.products.ToList();
+            List<stockOuts> listockOuts = objDB.stockOuts.Select(x => new stockOuts { 
+                                                                               id = x.id,
+                                                                               productId = x.productId, 
+                                                                               productName = objProducts.Where(y => y.id == x.productId).Select(x => x.name).FirstOrDefault(),
+                                                                               qty = x.qty
+            }).OrderByDescending(x => x.id).ToList();
+            return View(listockOuts);
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            ViewBag.ProductList = iproducts.GetAllProducts;
+            ERPFacts objDB = objHelper.GetDatabase();
+            List<products> objProducts = objDB.products.ToList();
+            ViewBag.ProductList = objProducts;
             return View();
         }
 
@@ -76,15 +89,12 @@ namespace FACTSERP.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
         {
             try
             {
                 //Also update prodtuct qty
-                stockOuts stockIns = istockOuts.GestockOutsById(id);
-
-                istockOuts.Remove(id);
+                stockOuts stockIns = istockOuts.GestockOutsById(id);                
 
                 if (stockIns != null)
                 {
@@ -92,7 +102,7 @@ namespace FACTSERP.Controllers
                     products updateProductsQty = iproducts.GeProductsById(stockIns.productId);
                     updateProductsQty.qty = Convert.ToInt32(updateProductsQty.qty + stockIns.qty);
                     iproducts.Update(updateProductsQty);
-
+                    istockOuts.Remove(id);
                     return RedirectToAction(nameof(Index));
                 }
                 else

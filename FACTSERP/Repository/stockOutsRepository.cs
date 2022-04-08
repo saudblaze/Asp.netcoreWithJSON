@@ -1,52 +1,47 @@
 ﻿using FACTSERP.Models;
+using FACTSERP.Utilities;
 
 namespace FACTSERP.Repository
 {
     public class stockOutsRepository : istockOuts
     {
-        private DatabaseContext db;
-
-        public stockOutsRepository(DatabaseContext _db)
+        private readonly HelperClass objHelper;
+        public stockOutsRepository(Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment)
         {
-            db = _db;
+            objHelper = new HelperClass(hostingEnvironment);
         }
 
-        public IEnumerable<stockOuts> GetAllstockOuts => from s in db.stockOuts
-                                                      join p in db.products on s.productId equals p.id
-                                                      select new stockOuts
-                                                      {
-                                                          id = s.id,
-                                                          productId = s.productId,
-                                                          qty = s.qty,
-                                                          productName = p.name
-                                                      };
-
+        
         public void Add(stockOuts stockOuts)
         {
-            db.stockOuts.Add(stockOuts);
-            db.SaveChanges();
+            ERPFacts objDB = objHelper.GetDatabase();
+            stockOuts.id = objDB.stockOuts.Count + 1;
+            objDB.stockOuts.Add(stockOuts);
+
+            objHelper.SaveChanges(objDB);            
         }
 
         public stockOuts GestockOutsById(int id)
         {
-            return (from s in db.stockOuts
-                    join p in db.products on s.productId equals p.id
-                    where s.id == id
-                    select new stockOuts
-                    {
-                        id = s.id,
-                        productId = s.productId,
-                        qty = s.qty,
-                        productName = p.name
-                    }).FirstOrDefault();
+            ERPFacts objDB = objHelper.GetDatabase();
+            List<products> objProducts = objDB.products.ToList();
+            stockOuts listockOuts = objDB.stockOuts.Where(x => x.id == id).Select(x => new stockOuts
+            {
+                id = x.id,
+                productName = objProducts.Where(y => y.id == x.productId).Select(x => x.name).FirstOrDefault(),
+                qty = x.qty ,
+                productId = x.productId
+            }).OrderByDescending(x => x.id).FirstOrDefault();
+
+            return listockOuts;
 
         }
 
         public void Remove(int id)
         {
-            stockOuts stockOuts = db.stockOuts.Find(id);
-            db.stockOuts.Remove(stockOuts);
-            db.SaveChanges();
+            ERPFacts objDB = objHelper.GetDatabase();
+            objDB.stockOuts.RemoveAll(x => x.id == id);
+            objHelper.SaveChanges(objDB);
         }
     }
 }

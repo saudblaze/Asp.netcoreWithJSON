@@ -1,54 +1,46 @@
 ﻿using FACTSERP.Models;
+using FACTSERP.Utilities;
 
 namespace FACTSERP.Repository
 {
     public class stockInsRepository    : istockIns
     {
-        private DatabaseContext db;
+        private readonly HelperClass objHelper;
 
-        public stockInsRepository(DatabaseContext _db)
+        public stockInsRepository(Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment)
         {
-            db = _db;
+            objHelper = new HelperClass(hostingEnvironment);
         }
-
-        public IEnumerable<stockIns> GetAllStockIn => from s in db.stockIns
-                                                      join p in db.products on s.productId equals p.id
-                                                      select new stockIns
-                                                       {
-                                                            id = s.id,
-                                                            productId = s.productId,
-                                                            qty = s.qty,
-                                                            productName = p.name
-                                                       };
 
         public void Add(stockIns stockIns)
         {
-            db.stockIns.Add(stockIns);
-            db.SaveChanges();
+            ERPFacts objDB = objHelper.GetDatabase();
+            stockIns.id = objDB.stockIns.Count + 1;
+            objDB.stockIns.Add(stockIns);
+
+            objHelper.SaveChanges(objDB);
         }
 
         public stockIns GeStocksById(int id)
         {
-            return (from s in db.stockIns
-            join p in db.products on s.productId equals p.id
-            where s.id == id
-            select new stockIns
+            ERPFacts objDB = objHelper.GetDatabase();
+            List<products> objProducts = objDB.products.ToList();
+            stockIns listockIns = objDB.stockIns.Where(x => x.id == id).Select(x => new stockIns
             {
-                id = s.id,
-                productId = s.productId,
-                qty = s.qty,
-                productName = p.name
-            }).FirstOrDefault();
+                id = x.id,
+                productName = objProducts.Where(y => y.id == x.productId).Select(x => x.name).FirstOrDefault(),
+                qty = x.qty,
+                productId = x.productId
+            }).OrderByDescending(x => x.id).FirstOrDefault();
 
+            return listockIns;
         }
 
         public void Remove(int id)
         {
-            stockIns stockIns = db.stockIns.Find(id);
-            db.stockIns.Remove(stockIns);
-            db.SaveChanges();
+            ERPFacts objDB = objHelper.GetDatabase();
+            objDB.stockIns.RemoveAll(x => x.id == id);
+            objHelper.SaveChanges(objDB);            
         }
-
-
     }
 }
