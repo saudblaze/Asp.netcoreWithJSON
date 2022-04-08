@@ -1,0 +1,70 @@
+﻿@model IEnumerable<FACTSERP.Models.products>
+
+@{
+    ViewData["Title"] = "Product Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="page-header">
+            <h3>Product Master</h3>
+
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <p>
+                    <a class="btn btn-warning" asp-action="Create">Create New</a>
+                    <a class="btn btn-primary" asp-controller="Dashboard" asp-action="Index">Back to List</a>
+                </p>
+                <table class="table" id="mytable">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.id)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.name)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.qty)
+                            </th>
+                            
+                            <th>
+
+                            </th>
+                            <th>
+
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.id)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.qty)
+                                </td>
+                                
+                                <td>
+                                    <a class="btn btn-info" asp-action="Edit" asp-route-id="@item.id">Edit</a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.id">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+

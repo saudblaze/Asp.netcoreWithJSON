@@ -1,0 +1,51 @@
+﻿@model FACTSERP.Models.stockIns
+
+@{
+    ViewData["Title"] = "Index";   
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="card">
+    <div class="card-body">
+        <div class="page-header">           
+            <h3>Add Stock In<a style="float: right;" asp-action="Index" class="btn btn-primary">Back to StockIn List</a></h3>      
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <form asp-action="Create">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label asp-for="productId" class="control-label"></label>
+                                <select name="productId" id="ddl_productfilter" class="form-control  experience-jquerySelect2-tag">
+                                <option selected value="">Select Product</option>
+                                    @foreach (var item in ViewBag.ProductList)
+                                    {
+                                        <option value="@item.id">@item.name </option>
+                                    }
+                                </select>
+                                <span asp-validation-for="productId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="qty" class="control-label"></label>
+                                <input asp-for="qty" class="form-control" required />
+                                <span asp-validation-for="qty" class="text-danger"></span>
+                            </div>
+
+                            @if (@ViewBag.Message != null)
+                            {
+                                <div class="form-group">
+                                    <label class="label label-danger">@ViewBag.Message</label>
+                                </div>
+                            }
+                            <div class="form-group mt-2">
+                                <button type="submit" value="Save" class="btn btn-info" >Save StockIn</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

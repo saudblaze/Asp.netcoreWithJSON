@@ -1,0 +1,38 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Test Product 1",
+      "qty": 30
+    },
+    {
+      "id": 2,
+      "name": "Test Product 3",
+      "qty": 12
+    }
+  ],
+  "stockIns": [
+    {
+      "id": 1,
+      "productId": 2,
+      "qty": 5
+    },
+    {
+      "id": 2,
+      "productId": 1,
+      "qty": 15
+    }
+  ],
+  "stockOuts": [
+    {
+      "id": 1,
+      "productId": 2,
+      "qty": 3
+    },
+    {
+      "id": 2,
+      "productId": 1,
+      "qty": 4
+    }
+  ]
+}
